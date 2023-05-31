@@ -11,6 +11,10 @@ module Ip2region
     @@ip_2_region_path = path
   end
 
+  def self.cache_enabled=(cache_enabled)
+    @@ip_2_cache_enabled = cache_enabled
+  end  
+
   def self.search(ip)
 
     if @@ip_2_region_path.nil?
@@ -18,6 +22,7 @@ module Ip2region
     end
 
     XdbSearcher.xdb_path = @@ip_2_region_path
+    XdbSearcher.ip_2_cache_enabled = @@ip_2_cache_enabled
 
     searcher = XdbSearcher.instance
     searcher.search(ip)

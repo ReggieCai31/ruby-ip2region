@@ -23,18 +23,32 @@ module Ip2region
       @@xdb_path
     end
 
-    def initialize()
-      init_database(@@xdb_path, nil, nil)
+    def self.ip_2_cache_enabled= (cache_enabled)
+      @@ip_2_cache_enabled = cache_enabled
     end
 
-    def init_database(dbfile, vi, cb)
+    def self.ip_2_cache_enabled
+      @@ip_2_cache_enabled
+    end
+
+    def initialize()
+      init_database(@@xdb_path, nil, nil, @@ip_2_cache_enabled)
+    end
+
+    def init_database(dbfile, vi, cb, cache_enabled)
       begin
         if cb
           @f = nil
           @vector_index = nil
           @content_buff= cb
         else
-          @f = File.open(dbfile, "rb")
+          if cache_enabled
+            @f = Rails.cache.fetch('ip2_xdb_file') do
+              File.open(dbfile, "rb")
+            end
+          else
+            @f = File.open(dbfile, "rb")
+          end     
           @vector_index = vi
         end
       rescue IOError => e
